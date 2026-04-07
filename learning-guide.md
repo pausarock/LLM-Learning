@@ -20,11 +20,11 @@
 | 周 | 主题 | 必交付（面试可讲） |
 |----|------|-------------------|
 | **W1** | Transformer 要点 + **LLM API 与流式** | 能画 Attention；调通 **流式 Chat**（OpenAI 兼容或国内 API） |
-| **W2** | **RAG 主干**：切分、Embedding、向量库、拼接 | **可运行最小 RAG**（含引用片段 id）+ 1 个失败案例分析 |
-| **W3** | **RAG 进阶**：Hybrid、Rerank、Query 改写、元数据 | **baseline vs +rerank** 对比表（指标可简） |
-| **W4** | **Agent**：Function Calling、状态机、超时/重试 | **2～3 个工具** 的闭环 + 降级策略说明 |
-| **W5** | **框架 + 结构化输出**：LangChain / LlamaIndex / **LangGraph 选一** | 一条可运行 **Chain 或 Graph**；**Pydantic** 约束输出示例 |
-| **W6** | **微调应用向**：SFT 数据、LoRA/QLoRA、与 RAG 取舍 | **LoRA 或 QLoRA** 极小任务跑通 + 书面取舍话术 |
+| **W2** | **微调先行（LoRA/QLoRA）**：SFT 数据、训练流程、评估口径 | **LoRA/QLoRA 最小任务跑通** + 1 页「何时微调」取舍说明 |
+| **W3** | **RAG 主干**：切分、Embedding、向量库、拼接 | **可运行最小 RAG**（含引用片段 id）+ 1 个失败案例分析 |
+| **W4** | **RAG 进阶**：Hybrid、Rerank、Query 改写、元数据 | **baseline vs +rerank** 对比表（指标可简） |
+| **W5** | **Agent**：Function Calling、状态机、超时/重试 | **2～3 个工具** 的闭环 + 降级策略说明 |
+| **W6** | **框架 + 结构化输出**：LangChain / LlamaIndex / **LangGraph 选一** | 一条可运行 **Chain 或 Graph**；**Pydantic** 约束输出示例 |
 | **W7** | **推理与服务**：KV/上下文、**FastAPI**、**vLLM/Ollama**、Docker | **SSE** 推理服务 + **Dockerfile** 可构建 |
 | **W8** | **评测、安全、成本、作品集** | **Ragas 或自研 faithfulness 检查**；注入防御清单；**架构图 + 2×STAR** |
 
@@ -60,35 +60,36 @@
 - **术语**：背 **§1**（架构）核心词 + §3 中 KV Cache / Prefill-Decode。  
 - **选做**：tiktoken 粗算费用。
 
-### W2：RAG 主干
+### W2：微调先行（LoRA/QLoRA）
+
+- **必做**：PEFT LoRA/QLoRA 跑通一个极小任务（先重流程，不追最优效果）。  
+- **必做**：整理微调数据最小规范（输入、输出、清洗规则、训练/验证划分）。  
+- **术语**：背 **§2**（对齐与 PEFT）核心词，能口述 LoRA 与全参微调差异。  
+- **选做**：写 1 页「何时微调，何时 RAG」取舍文档（成本、时延、维护、可更新性）。
+
+### W3：RAG 主干
 
 - **必做**：加载 → chunk → embed → 向量库 → top-k → prompt → **带 source id 的回答**。  
 - **术语**：背 **§5** RAG 全表。  
 - **选做**：Markdown 结构切分。
 
-### W3：RAG 进阶
+### W4：RAG 进阶
 
 - **必做**：Hybrid + Rerank；Query rewrite 或 HyDE 任选一种。  
 - **术语**：MRR/nDCG/Hit@k 能举例说明用途。  
 - **选做**：多租户 metadata。
 
-### W4：Agent
+### W5：Agent
 
 - **必做**：Tool calling 解析–执行–回填；超时与异常 JSON。  
 - **术语**：背 **§4** Agent / ReAct / Tool Calling。  
 - **选做**：纯文本 ReAct。
 
-### W5：框架与结构化输出
+### W6：框架与结构化输出
 
 - **必做**：LangChain / LlamaIndex / LangGraph **选一** 官方 tutorial 改版；Pydantic 输出。  
 - **术语**：§9 中 MCP、框架角色（能对比「不用框架怎么写」）。  
 - **选做**：LangGraph checkpoint。
-
-### W6：微调
-
-- **必做**：PEFT LoRA；TRL SFT 或小脚本；**何时 RAG / 何时 LoRA** 写一页。  
-- **术语**：§2 对齐与 PEFT。  
-- **选做**：DPO 流程口述。
 
 ### W7：推理与服务
 
@@ -134,11 +135,11 @@
 
 | 优先级 | 项目 | 建议周次 |
 |--------|------|----------|
-| P0 | 最小 RAG + 引用 + 评测 | W2–W3 |
-| P0 | Tool-calling Agent | W4 |
+| P1 | LoRA/QLoRA 最小任务（流程打通） | W2 |
+| P0 | 最小 RAG + 引用 + 评测 | W3–W4 |
+| P0 | Tool-calling Agent | W5 |
 | P1 | FastAPI 流式 + Docker + vLLM/Ollama | W7 |
-| P1 | 框架 Chain/Graph + 结构化输出 | W5 |
-| P2 | LoRA/QLoRA 小任务 | W6 |
+| P1 | 框架 Chain/Graph + 结构化输出 | W6 |
 | **P2** | **OpenClaw + 自定义 Skill** | **W9–W11** |
 | **P3** | **OpenClaw 综合助手** | **W12** |
 
@@ -174,7 +175,7 @@
 
 ## 与 `day1–4` 的关系
 
-Transformer 日课（含 **`day4-learning.md`** 代码对齐张量）压在 **W1**；不要因手写 attention 拖延 **W2 RAG**。  
+Transformer 日课（含 **`day4-learning.md`** 代码对齐张量）压在 **W1**；若 W2 先做微调，注意在 **W3** 及时接上 RAG 主干。  
 
 ---
 
